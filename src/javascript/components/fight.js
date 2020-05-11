@@ -11,9 +11,9 @@ export async function fight(firstFighter, secondFighter) {
 
 export function getDamage(attacker, defender) {
   // return damage
-  let attack = getBlockPower(defender);
-  let defense = getHitPower(attacker)
-  return  defense >= attack ? 0 : attack - defense;
+  let attackValue = getHitPower(attacker);
+  let defenseValue = getBlockPower(defender)
+  return  defenseValue >= attackValue ? 0 : attackValue - defenseValue;
 }
 
 export function getHitPower(fighter) {
