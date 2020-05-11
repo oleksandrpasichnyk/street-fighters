@@ -8,7 +8,6 @@ export function createFighterPreview(fighter, position) {
     className: `fighter-preview___root ${positionClassName}`,
   });
 
-  console.log(fighter);
   let preview = document.createElement("div");
   preview.innerHTML = `<img src="${source}" alt="">
                 <h1>${name}</h1>

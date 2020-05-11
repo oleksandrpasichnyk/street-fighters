@@ -22,12 +22,10 @@ const fightersDetailsMap = new Map();
 
 export async function getFighterInfo(fighterId) {
   let fighter = fighterService.getFighterDetails(fighterId);
-  
   if(!fightersDetailsMap.has(fighterId)) {
     // send request here
     fightersDetailsMap.set(fighterId, fighter);
   }
-
   return fightersDetailsMap.get(fighterId);
   // get fighter info from fighterDetailsMap or from service and write it to fighterDetailsMap
   // отримує ід і записує інфо в мап або витягує з нього, якщо вона там вже є

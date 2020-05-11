@@ -1,6 +1,7 @@
 import { createElement } from '../../helpers/domHelper';
 
 export function showModal({ title, bodyElement, onClose = () => {} }) {
+  
   const root = getModalContainer();
   const modal = createModal({ title, bodyElement, onClose }); 
   
@@ -12,6 +13,7 @@ function getModalContainer() {
 }
 
 function createModal({ title, bodyElement, onClose }) {
+  console.log(title);
   const layer = createElement({ tagName: 'div', className: 'modal-layer' });
   const modalContainer = createElement({ tagName: 'div', className: 'modal-root' });
   const header = createHeader(title, onClose);
