@@ -9,27 +9,35 @@ export async function fight(firstFighter, secondFighter) {
   });
 }
 
-export function getDamage(attacker, defender, type) {
+export function getDamage(attacker, defender) {
   // return damage
-  return getBlockPower(defender, type) >= getHitPower(attacker) ? 0 : getHitPower(attacker, type) - getBlockPower(defender, type);
+  let attack = getBlockPower(defender);
+  let defense = getHitPower(attacker)
+  return  defense >= attack ? 0 : attack - defense;
 }
 
-export function getHitPower(fighter, type) {
+export function getHitPower(fighter) {
   // return hit power
-  if(fighter === null){return 0}
-  return type === 'ordinary' ? fighter.attack * Math.random() + 1 : fighter.attack * 2;
+  let randomNumber = Math.random() + 1;
+  return fighter.attack * randomNumber;
 }
 
-export function getBlockPower(fighter, type) {
+export function getComboPower(fighter) {
+  // return hit power
+  return fighter.attack * 2;
+}
+
+export function getBlockPower(fighter) {
   // return block power
-  if(fighter === null){return 0}
-  return type === 'ordinary' ? fighter.defense * Math.random() + 1 : 0;
+  let randomNumber = Math.random() + 1;
+    return fighter.defense * randomNumber;
 }
 
 let isComboFirst, isComboSecond, index;
 let previousTimeFirst, previousTimeSecond, currentTime;
 export function keyDownAction(pressedKeys, firstFighter, secondFighter, firstMaxHealth, secondMaxHealth) {
   [isComboFirst, isComboSecond] = [true, true];
+  console.log(pressedKeys);
   controls.PlayerOneCriticalHitCombination.forEach(key => {
     isComboFirst = isComboFirst && pressedKeys.includes(key);
     if(!isComboFirst){return 0};
@@ -76,37 +84,39 @@ export function keyDownAction(pressedKeys, firstFighter, secondFighter, firstMax
   }
   //pressedKeys = pressedKeys.filter(key => Object.values(controls).includes(key));
   if(pressedKeys.length != 0){ 
-    
-    let damage, attacker = null, defender = null, type = 'ordinary';
+    console.log(pressedKeys);
+    let damage;
     let firstAction = '';
     let secondAction = '';
 
     for (let i = 0; i < pressedKeys.length; i++) {
       switch(pressedKeys[i]){
-        case 'KeyA': firstAction = 'attack', attacker = firstFighter; break;
-        case 'KeyD': firstAction = 'block', defender = firstFighter; break;
-        case 'KeyJ': secondAction = 'attack', attacker = secondFighter; break;
-        case 'KeyL': secondAction = 'block', defender = secondFighter; break;
-        case 'KeyComboFirst': firstAction = 'combo', attacker = firstFighter, type = 'combo'; break;
-        case 'KeyComboSecond': secondAction = 'combo', attacker = secondFighter, type = 'combo'; break;
+        case 'KeyA': firstAction = 'attack'; break;
+        case 'KeyD': firstAction = 'block'; break;
+        case 'KeyJ': secondAction = 'attack'; break;
+        case 'KeyL': secondAction = 'block'; break;
+        case 'KeyComboFirst': firstAction = 'combo'; break;
+        case 'KeyComboSecond': secondAction = 'combo'; break;
       }
     }
 
-    if(firstAction === secondAction){
-      //damage = getDamage(attacker, defender, type);
-    }else{
-      
-      damage = getDamage(attacker, defender, type);
-      console.log(damage);
+    const rightFighterbar = document.querySelector('#right-fighter-indicator');
+    const leftFighterbar = document.querySelector('#left-fighter-indicator');
+    if(firstAction === 'block' && secondAction !== 'combo'){return 0}
+    if(secondAction === 'block' && firstAction !== 'combo'){return 0}
 
-      if(defender === null){
-        attacker === firstFighter ? defender = secondFighter : defender = firstFighter;
-      }
-      defender.health -= damage;
-      console.log(defender.name + "health: " + defender.health);
-      const rightFighterbar = document.querySelector('#right-fighter-indicator');
-      const leftFighterbar = document.querySelector('#left-fighter-indicator');
-      defender === firstFighter ? renderBar(leftFighterbar, defender.health, secondMaxHealth) : renderBar(rightFighterbar, defender.health, firstMaxHealth);
+    if(firstAction === 'combo' || firstAction === 'attack'){
+      firstAction === 'combo' ? damage = getComboPower(firstFighter) : damage = getDamage(firstFighter, secondFighter);
+      secondFighter.health -= damage;
+      console.log(damage);
+      renderBar(rightFighterbar, secondFighter.health, secondMaxHealth);
+    }
+
+    if(secondAction === 'combo' || secondAction === 'attack'){
+      secondAction === 'combo' ? damage = getComboPower(secondFighter) : damage = getDamage(secondFighter, firstFighter);
+      firstFighter.health -= damage;
+      console.log(damage);
+      renderBar(leftFighterbar, firstFighter.health, firstMaxHealth);
     }
 
     function renderBar(bar, health, maxhealth){
