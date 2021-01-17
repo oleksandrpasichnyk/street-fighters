@@ -1,7 +1,6 @@
 import { createElement } from '../helpers/domHelper';
 import { createFighterImage } from './fighterPreview';
-import { fight, keyDownAction} from './fight';
-import { showWinnerModal } from './modal/winner'
+import { fight } from './fight';
 
 export function renderArena(selectedFighters) {
   const root = document.getElementById('root');
@@ -13,28 +12,13 @@ export function renderArena(selectedFighters) {
   // todo:
   // - start the fight
   
-  const [firstFighter, secondFighter] = selectedFighters;
-  const [firstMaxHealth, secondMaxHealth] = [firstFighter.health, secondFighter.health];
-  let pressedKeys = [];
-  document.addEventListener('keydown', function(event) {
-    let code = event.code;
-    pressedKeys.push(code);
-    setTimeout(() => { 
-      //document.removeEventListener('keydown');
-      keyDownAction(pressedKeys, ...selectedFighters, firstMaxHealth, secondMaxHealth);
-      pressedKeys = [];
-    }, 200);
-    if(firstFighter.health <= 0 || secondFighter.health <= 0){
-      fight(...selectedFighters)
-      .then(winner => showWinnerModal(winner));
-    }
-  });
-
-  // setTimeout(() => {
-  //   keyDownAction(pressedKeys, ...selectedFighters);
-  // }, 100);
-  // - when fight is finished show winner
+  const [firstFighter, secondFighter] = [...selectedFighters];
   
+  let getFirstKeyPress = function(event){
+    fight(firstFighter, secondFighter, event);
+    document.removeEventListener('keydown', getFirstKeyPress);
+  }
+  document.addEventListener('keydown', getFirstKeyPress);
 }
 
 function createArena(selectedFighters) {

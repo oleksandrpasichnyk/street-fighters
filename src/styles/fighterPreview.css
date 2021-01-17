@@ -4,6 +4,10 @@
   flex-basis: 250px;
 }
 
+.fighter-preview___root img{
+  height: 60vh;
+}
+
 .fighter-preview___right {
   align-items: flex-end;
   text-align: right;
