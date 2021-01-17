@@ -1,5 +1,6 @@
 import { createElement } from '../helpers/domHelper';
 import { createFighterImage } from './fighterPreview';
+import { showWinnerModal } from './modal/winner'
 import { fight } from './fight';
 
 export function renderArena(selectedFighters) {
@@ -15,7 +16,11 @@ export function renderArena(selectedFighters) {
   const [firstFighter, secondFighter] = [...selectedFighters];
   
   let getFirstKeyPress = function(event){
-    fight(firstFighter, secondFighter, event);
+    fight(firstFighter, secondFighter, event)
+    .then(
+      winner => showWinnerModal(winner),
+      error => console.log(error)
+    );
     document.removeEventListener('keydown', getFirstKeyPress);
   }
   document.addEventListener('keydown', getFirstKeyPress);

@@ -1,54 +1,55 @@
 import { controls } from '../../constants/controls';
-import { showWinnerModal } from './modal/winner'
 
-export function fight(firstFighter, secondFighter, firstEvent) {
+export async function fight(firstFighter, secondFighter, firstEvent) {
   const [firstMaxHealth, secondMaxHealth] = [firstFighter.health, secondFighter.health];
-  
-  let pressedKeys = [];
-  getPressedKey(firstEvent);
+  return new Promise((resolve) => {
+    let pressedKeys = [];
+    getPressedKey(firstEvent);
 
-  function getPressedKey(event){
-    let code = event.code;
-    pressedKeys.push(code);
-    setTimeout(() => { 
-      if(pressedKeys.length !== 0){
-        playRound(pressedKeys, firstFighter, secondFighter, firstMaxHealth, secondMaxHealth);
-        if(isFinished(firstFighter, secondFighter)){
-          getWinner(firstFighter, secondFighter, getPressedKey)
-          .then(
-            winner => showWinnerModal(winner),
-            error => console.log(error)
-          );
-        }
-        pressedKeys = [];
-        }
-    }, 200);
-  }
-  document.addEventListener('keydown', getPressedKey, false);
+    function getPressedKey(event){
+      let code = event.code;
+      pressedKeys.push(code);
+      setTimeout(() => { 
+        if(pressedKeys.length !== 0){
+          playRound(pressedKeys, firstFighter, secondFighter, firstMaxHealth, secondMaxHealth);
+          if(isFinished(firstFighter, secondFighter)){
+            if(firstFighter.health <= 0 || secondFighter.health <= 0){
+              document.removeEventListener('keydown', getPressedKey, false);
+              firstFighter.health <= 0  ? resolve(secondFighter) : resolve(firstFighter);
+            }else {
+              reject(new Error("Can't determine a winner!"))
+            }
+          }
+          pressedKeys = [];
+          }
+      }, 200);
+    }
+    document.addEventListener('keydown', getPressedKey, false);
+  });
 }
 
 function isFinished(firstFighter, secondFighter){
   return firstFighter.health <= 0 || secondFighter.health <= 0;
 }
 
-function getWinner(firstFighter, secondFighter, getPressedKey){
-  return new Promise((resolve, reject) => {
-    if(firstFighter.health <= 0 || secondFighter.health <= 0){
-      document.removeEventListener('keydown', getPressedKey, false);
-      firstFighter.health <= 0  ? resolve(secondFighter) : resolve(firstFighter);
-    }else {
-      reject(new Error("Can't determine a winner!"))
-    }
-  });
-}
+// function getWinner(firstFighter, secondFighter, getPressedKey){
+//   return new Promise((resolve, reject) => {
+//     if(firstFighter.health <= 0 || secondFighter.health <= 0){
+//       document.removeEventListener('keydown', getPressedKey, false);
+//       firstFighter.health <= 0  ? resolve(secondFighter) : resolve(firstFighter);
+//     }else {
+//       reject(new Error("Can't determine a winner!"))
+//     }
+//   });
+// }
 
-function getDamage(attacker, defender) {
+export function getDamage(attacker, defender) {
   let attackValue = getHitPower(attacker);
   let defenseValue = getBlockPower(defender)
   return  defenseValue >= attackValue ? 0 : attackValue - defenseValue;
 }
 
-function getHitPower(fighter) {
+export function getHitPower(fighter) {
   let randomNumber = Math.random() + 1;
   return fighter.attack * randomNumber;
 }
@@ -57,7 +58,7 @@ function getComboPower(fighter) {
   return fighter.attack * 2;
 }
 
-function getBlockPower(fighter) {
+export function getBlockPower(fighter) {
   let randomNumber = Math.random() + 1;
     return fighter.defense * randomNumber;
 }
