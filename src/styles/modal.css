@@ -13,8 +13,10 @@
 .modal-root {
   display: flex;
   flex-direction: column;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   border: 1px solid rgba(0, 0, 0, .2);
   background-color: white;
+  padding: 1rem;
 }
 
 .modal-header {
@@ -22,10 +24,10 @@
   align-items: center;
   justify-content: space-between;
   min-width: 300px;
-  padding: 1rem;
   border-bottom: 1px solid #e9ecef;
   font-weight: 700;
-  font-size: 22px;
+  font-size: 2rem;
+  padding-left: 2rem;
 }
 
 .modal-body {
@@ -37,4 +39,19 @@
   font-weight: 700;
   line-height: 1;
   cursor: pointer;
+}
+
+.winner-data {
+  height: 50vh;
+  display: flex;
+  justify-content: space-between;
+  margin: 2rem;
+}
+
+.winner-image {
+  margin-right: 3rem;
+}
+
+.winner-indexes {
+  font-size: 1.2rem;
 }

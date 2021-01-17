@@ -3,6 +3,7 @@ import { showWinnerModal } from './modal/winner'
 
 export function fight(firstFighter, secondFighter, firstEvent) {
   const [firstMaxHealth, secondMaxHealth] = [firstFighter.health, secondFighter.health];
+  
   let pressedKeys = [];
   getPressedKey(firstEvent);
 
@@ -70,6 +71,14 @@ function isCombo(combination, pressedKeys){
   return [isComboAttack, pressedKeys];
 };
 
+function isValidInterval(previousTime, currentTime){
+  if(previousTime === undefined){
+    return true;
+  }
+  let seconds = (currentTime - previousTime) / 1000;
+  return seconds >= 10 ? true : false;
+}
+
 function checkComboInterval(isComboAttack, pressedKeys, previousTime, currentTime, playerIndex){
   if(isComboAttack && isValidInterval(previousTime, currentTime)){
     pressedKeys.push(playerIndex === 1 ? 'PlayerOneCombo' : 'PlayerTwoCombo');
@@ -100,38 +109,6 @@ function playRound(pressedKeys, firstFighter, secondFighter, firstMaxHealth, sec
   calculateRound(firstFighterAction, secondFighterAction, firstFighter, secondFighter, firstMaxHealth, secondMaxHealth)
 }
 
-function isValidInterval(previousTime, currentTime){
-  if(previousTime === undefined){
-    return true;
-  }
-  let seconds = (currentTime - previousTime) / 1000;
-  return seconds >= 10 ? true : false;
-}
-
-function renderBar(bar, health, maxhealth){
-  bar.style.width = ((100*health)/maxhealth).toFixed(0) + '%';
-}
-
-function calculateRound(firstAction, secondAction, firstFighter, secondFighter, firstMaxHealth, secondMaxHealth){
-  let damage;
-  const rightFighterbar = document.querySelector('#right-fighter-indicator');
-  const leftFighterbar = document.querySelector('#left-fighter-indicator');
-  if(firstAction === 'block' && secondAction !== 'combo'){return 0}
-  if(secondAction === 'block' && firstAction !== 'combo'){return 0}
-
-  if(firstAction === 'combo' || firstAction === 'attack'){
-    firstAction === 'combo' ? damage = getComboPower(firstFighter) : damage = getDamage(firstFighter, secondFighter);
-    secondFighter.health -= damage;
-    renderBar(rightFighterbar, secondFighter.health, secondMaxHealth);
-  }
-
-  if(secondAction === 'combo' || secondAction === 'attack'){
-    secondAction === 'combo' ? damage = getComboPower(secondFighter) : damage = getDamage(secondFighter, firstFighter);
-    firstFighter.health -= damage;
-    renderBar(leftFighterbar, firstFighter.health, firstMaxHealth);
-  }
-}
-
 function chooseOneAction(pressedKeys, fighterIndex){
   let fighterAction;
 
@@ -150,4 +127,33 @@ function chooseOneAction(pressedKeys, fighterIndex){
     fighterAction = 'attack';
     return fighterAction;
   }
+}
+
+function calculateRound(firstAction, secondAction, firstFighter, secondFighter, firstMaxHealth, secondMaxHealth){
+  let damage;
+  
+  if(firstAction === 'block' && secondAction !== 'combo'){return 0}
+  if(secondAction === 'block' && firstAction !== 'combo'){return 0}
+
+  if(firstAction === 'combo' || firstAction === 'attack'){
+    firstAction === 'combo' ? damage = getComboPower(firstFighter) : damage = getDamage(firstFighter, secondFighter);
+    secondFighter.health -= damage;
+    renderBar('#right-fighter-indicator', secondFighter.health, secondMaxHealth);
+  }
+
+  if(secondAction === 'combo' || secondAction === 'attack'){
+    secondAction === 'combo' ? damage = getComboPower(secondFighter) : damage = getDamage(secondFighter, firstFighter);
+    firstFighter.health -= damage;
+    renderBar('#left-fighter-indicator', firstFighter.health, firstMaxHealth);
+  }
+}
+
+function renderBar(barId, health, maxhealth){
+  let bar = document.querySelector(barId);
+  if(health <= 0){
+    bar.style.width = 0;
+  }else{
+    bar.style.width = ((100*health)/maxhealth).toFixed(0) + '%';
+  }
+  
 }
